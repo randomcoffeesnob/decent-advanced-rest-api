@@ -1,0 +1,4 @@
+webserver_authentication_key myFancyAuthenticationKey
+webserver_authentication 0
+webserver_port 8888
+

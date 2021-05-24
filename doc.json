@@ -1,0 +1,60 @@
+{
+    "endpoints": [
+        {
+            "method": "GET",
+            "path": "/api/status",
+            "description": "running status of the machine"
+        },
+        {
+            "method": "POST",
+            "path": "/api/status/  {\"active\": \"true/false\"}",
+            "description": "change the status of the machine - on or standby"
+        },
+        {
+            "method": "GET",
+            "path": "/api/status/details",
+            "description": "get a detailed status of your machine - the available information depends on the state/substate"
+        },
+        {
+            "method": "GET",
+            "path": "/api/shot/",
+            "description": "get a list of the shots on your machine"
+        },
+        {
+            "method": "GET",
+            "path": "/api/shot/{shot.tcl}",
+            "description": "get a single shot as "
+        },
+        {
+            "method": "GET",
+            "path": "/api/profile",
+            "description": "list of profiles on your machine"
+        },
+        {
+            "method": "GET",
+            "path": "/api/profile/{profile_filename.tcl}",
+            "description": ""
+        },
+        {
+            "method": "POST",
+            "path": "/api/profile/",
+            "description": "add a profile to your machine - the filename will be the current timestamp so nothing should be overwritten"
+        },
+        {
+            "method": "GET",
+            "path": "/",
+            "description": "Dashboard including most API functions"
+        },
+        {
+            "method": "GET",
+            "path": "/api/flush",
+            "description": "Flush the log"
+        },
+        {
+            "method": "GET",
+            "path": "/api/help",
+            "description": "Get this short API doc."
+        }
+    ],
+    "authentication": "Authentication is done with a header param auth - if enabled it needs to match the configured string"
+}

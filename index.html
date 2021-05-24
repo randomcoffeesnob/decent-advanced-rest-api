@@ -1,0 +1,476 @@
+<html>
+
+<head>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.2.0/chart.min.js" integrity="sha512-VMsZqo0ar06BMtg0tPsdgRADvl0kDHpTbugCBBrL55KmucH6hP9zWdLIWY//OTfMnzz6xWQRxQqsUFefwHuHyg==" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css" integrity="sha512-fzA+tLgtwjys8FSpEdAGGamBJiWnHCwSkEu5P3EGr73U8AFnOSE1kzI6+RSYvf4zIs5BPWVrdzygD+nvZKbxIg==" crossorigin="anonymous" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style type="text/css">
+    .svg-icon {
+      width: 1em;
+      height: 1em;
+    }
+
+    .svg-icon path,
+    .svg-icon polygon,
+    .svg-icon rect {
+      fill: #444;
+    }
+
+    .svg-icon circle {
+      stroke: #444;
+      stroke-width: 1;
+    }
+    
+   
+  </style>
+  <script>
+
+    var address = location.origin != "null" ? location.origin : "http://127.0.0.1:8080";
+    window.addEventListener("load", onLoad);
+
+    function onLoad() {
+      updateTimer();
+      loadShots();
+      loadProfiles();
+      getDoc();
+      initChart();
+    }
+
+    function changeState(newState) {
+      // var auth = '?auth=' + document.getElementById('api_key').value;
+      var url = address + "/api/status"
+      var data;
+      if (newState == 'start') {
+        data = {"active":"true"};
+      }
+      if (newState == 'sleep'){
+        data = {"active":"false"};
+      }
+
+      fetch(url, {
+          method: 'POST',
+          mode: 'cors', 
+          cache: 'no-cache',
+          credentials: 'same-origin', 
+          headers: {'Content-Type': 'application/json'},
+          redirect: 'follow', 
+          referrerPolicy: 'no-referrer', 
+          body: JSON.stringify(data) 
+        });
+      }
+
+    var timer;
+    function updateTimer() {
+      if (document.getElementById("refresh").checked) {
+        timer = setInterval(getState, 5000);
+      } else {
+        clearInterval(timer);
+      }
+    }
+
+    function getState() {
+      fetch(address + "/api/status/details").then(r => r.json()).then(j => {
+        writeToScreen(j);
+      })
+    }
+
+    function writeToScreen(json) {
+      var output = document.getElementById("output");
+      while (output.firstChild) {
+        output.firstChild.remove();
+      }
+
+      Object.keys(json).forEach(key => {
+        let value = json[key];
+        if (value != "") {
+          var dt = document.createElement("dt");
+          dt.appendChild(document.createTextNode(key));
+          output.appendChild(dt);
+
+          var dd = document.createElement("dd");
+          dd.appendChild(document.createTextNode(value));
+          output.appendChild(dd);
+        }
+      })
+    }
+
+    function loadShots() {
+      var x = document.getElementById("shots");
+      x.options.length = 0
+      fetch(address + "/api/shot").then(r => r.json())
+        .then(j => j.sort().reverse().map((e) => {
+          var option = document.createElement("option");
+          option.text = e;
+          x.add(option);
+        })).then(e => {
+          x.options[0].selected = true;
+          x.onchange();
+        });
+    }
+
+    function loadProfiles () {
+      var x = document.getElementById("profiles");
+      x.options.length = 0
+      fetch(address + "/api/profile/").then(r => r.json())
+        .then(j => j.sort().reverse().map((e) => {
+          var option = document.createElement("option");
+          option.text = e;
+          x.add(option);
+        })).then(e => {
+          x.options[0].selected = true;
+          x.onchange();
+        });
+    }
+
+    function uploadProfile() {
+     var url = address + '/api/profile';
+      
+      var input = document.getElementById("profileInput");
+      var file = input.files[0];
+     
+        fetch(url, {
+          method: 'POST',
+          mode: 'cors', 
+          cache: 'no-cache',
+          credentials: 'same-origin',
+          headers: {'Content-Type': 'text/plain'}, 
+          redirect: 'follow', 
+          referrerPolicy: 'no-referrer', 
+          body: file
+        });
+    }
+
+    function loadSelectedShot() {
+      let selected = document.getElementById("shots").value;
+      if (!selected) {
+        window.chart.data.datasets.forEach(ds => ds.data = null);
+        window.chart.update();
+      } else {
+        fetch(address + "/api/shot/" + selected + '?download=true').then(r => r.text())
+          .then(t => {
+            var time = extractArray(t, "espresso_elapsed");
+            var pressure = extractArray(t, "espresso_pressure");
+            var time_pressure = new Array();
+            for (var i = 0; i < time.length; i++) {
+              time_pressure.push({ x: time[i], y: pressure[i] });
+            }
+            var pressureGoal = extractArray(t, "espresso_pressure_goal");
+            var time_pressureGoal = new Array();
+            for (var i = 0; i < time.length; i++) {
+              let goal = pressureGoal[i];
+
+              time_pressureGoal.push({ x: time[i], y: goal >= 0 ? goal : NaN });
+            }
+
+            var flow = extractArray(t, "espresso_flow");
+            var time_flow = new Array();
+            for (var i = 0; i < time.length; i++) {
+              time_flow.push({ x: time[i], y: flow[i] });
+            }
+            var flowGoal = extractArray(t, "espresso_flow_goal");
+            var time_flowGoal = new Array();
+            for (var i = 0; i < time.length; i++) {
+              let goal = flowGoal[i];
+              time_flowGoal.push({ x: time[i], y: goal >= 0 ? goal : NaN });
+            }
+
+            var temperature = extractArray(t, "espresso_temperature_basket");
+            var time_temperature = new Array();
+            for (var i = 0; i < time.length; i++) {
+              time_temperature.push({ x: time[i], y: temperature[i] / 10 });
+            }
+            var temperatureGoal = extractArray(t, "espresso_temperature_goal");
+            var time_temperatureGoal = new Array();
+            for (var i = 0; i < time.length; i++) {
+              time_temperatureGoal.push({ x: time[i], y: temperatureGoal[i] / 10 });
+            }
+
+            var profile = extractString(t, "profile");
+            var duration = time[time.length];
+            document.getElementById('shot-details').innerText = profile;
+
+
+            //update chart
+            window.chart.data.datasets.forEach(dataset => {
+              switch (dataset.label) {
+                case 'pressure':
+                  dataset.data = time_pressure;
+                  break;
+                case 'pressure-goal':
+                  dataset.data = time_pressureGoal;
+                  break;
+                case 'flow':
+                  dataset.data = time_flow;
+                  break;
+                case 'flow-goal':
+                  dataset.data = time_flowGoal;
+                  break;
+                case 'temperature':
+                  dataset.data = time_temperature;
+                  break;
+                case 'temperature-goal':
+                  dataset.data = time_temperatureGoal;
+                  break;
+              }
+            });
+            window.chart.update();
+
+            
+          });
+      }
+    }
+
+    function loadSelectedProfile () {
+      let selected = document.getElementById("profiles").value;
+      if (!selected) {
+        window.chart.data.datasets.forEach(ds => ds.data = null);
+        window.chart.update();
+      } else {
+        fetch(address + "/api/profile/" + selected).then(r => r.text())
+          .then(t => {
+            document.getElementById('profile-title').innerText =   extractString(t, "profile_title");
+            document.getElementById('profile-description').innerText = extractString(t, "profile_notes");
+          })
+    }
+  }
+  function downloadProfile(){
+      let selected = document.getElementById("profiles").value;
+      if (!selected) {
+        window.chart.data.datasets.forEach(ds => ds.data = null);
+        window.chart.update();
+      } else {
+        fetch(address + "/api/profile/" + selected).then(r => r.text())
+          .then(t => {
+
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(t));
+            element.setAttribute('download', selected);
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+          })
+        }
+    }
+
+    function downloadShot(){
+      let selected = document.getElementById("shots").value;
+      if (!selected) {
+        window.chart.data.datasets.forEach(ds => ds.data = null);
+        window.chart.update();
+      } else {
+        fetch(address + "/api/shot/" + selected + '?download=true').then(r => r.text())
+          .then(t => {
+
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(t));
+            element.setAttribute('download', selected);
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+          })
+        }
+    }
+
+    function extractArray(shotfile, key) {
+      return extractString(shotfile, key).split(' ');
+    }
+
+    function extractString(shotfile, key) {
+      var match = shotfile.match(key + " \{(.+)\}");
+      if (match != null) {
+        return match[1];
+      } else {
+        return null;
+      }
+    }
+    function getDoc(){
+      fetch(address + "/api/help").then(r => r.json())
+          .then(t => {
+            t.endpoints.forEach(
+              e => {
+                document.getElementById('doc-list').insertAdjacentHTML('beforeend','<li><mark class="inline-block">' + e.method + '</mark> ' + e.path + ' - <span style="font-style: italic;">' + e.description + '</span></li>');
+              });       
+            });
+    }
+
+    function initChart() {
+      var ctx = document.getElementById("myChart").getContext("2d");
+      var borderDash = [10, 10];
+      var pointRadius = 2;
+      window.chart = new Chart(ctx, {
+        type: 'scatter',
+
+        // The data for our dataset
+        data: {
+          //labels: [1, 2, 4, 5, 6, 7, 8],
+          datasets: [{
+            showLine: true,
+            fill: false,
+            label: 'pressure',
+            borderColor: 'rgb(124,252,0)',
+            pointRadius: pointRadius
+          }, {
+            showLine: true,
+            fill: false,
+            label: 'pressure-goal',
+            borderColor: 'rgb(124,252,0)',
+            borderDash: borderDash,
+            pointRadius: 0
+          }, {
+            showLine: true,
+            fill: false,
+            label: 'flow',
+            borderColor: 'rgb(0,191,255)',
+            pointRadius: pointRadius
+          }, {
+            showLine: true,
+            fill: false,
+            label: 'flow-goal',
+            borderColor: 'rgb(0,191,255)',
+            borderDash: borderDash,
+            pointRadius: 0
+          }, {
+            showLine: true,
+            fill: false,
+            label: 'temperature',
+            borderColor: 'rgb(220,20,60)',
+            pointRadius: pointRadius
+          }, {
+            showLine: true,
+            fill: false,
+            label: 'temperature-goal',
+            borderColor: 'rgb(220,20,60)',
+            borderDash: borderDash,
+            pointRadius: 0
+          }]
+        },
+
+        options: {
+          tooltips: {
+            mode: 'x',
+          },
+          scales: {
+            xAxes: [{
+              type: 'linear',
+              position: 'bottom'
+            }]
+          }
+        }
+      });
+    }
+  </script>
+</head>
+
+<body>
+  <header>
+    <a href="#" class="logo">Decent</a>
+    <!-- <span style="float: right;">API Key:<input/></span>  -->
+    <!-- <a href="#" class="button">Status</a>
+    <a href="#" class="button">Profiles</a>
+    <a href="#" class="button">Shots</a> -->
+  </header>
+ 
+  <div class="collapse">
+    <input type="checkbox" id="collapse-section1" checked aria-hidden="true">
+    <label for="collapse-section1" aria-hidden="true">Status</label>
+    <div>
+      <input type="button"  onclick="changeState('start')" value="start" />
+      <input type="button"  onclick="changeState('sleep')" value="stand by" />
+      <input type="button" onclick="getState()" value="get state" />
+      <input type="checkbox" id="refresh" onclick="updateTimer()" /> <label for="refresh">auto refresh</label>
+      <div>
+        <dl id="output"></dl>
+      </div>
+    </div>
+
+    <input type="checkbox" id="collapse-section2" aria-hidden="true">
+    <label for="collapse-section2" aria-hidden="true">Shots</label>
+    <div style="max-height: 100%;">
+
+      <select id="shots" onchange="loadSelectedShot()"> </select>
+      <button onclick="loadShots()">
+        <svg class="svg-icon" viewBox="0 0 20 20">
+          <path fill="none" d="M19.305,9.61c-0.235-0.235-0.615-0.235-0.85,0l-1.339,1.339c0.045-0.311,0.073-0.626,0.073-0.949
+            c0-3.812-3.09-6.901-6.901-6.901c-2.213,0-4.177,1.045-5.44,2.664l0.897,0.719c1.053-1.356,2.693-2.232,4.543-2.232
+            c3.176,0,5.751,2.574,5.751,5.751c0,0.342-0.037,0.675-0.095,1l-1.746-1.39c-0.234-0.235-0.614-0.235-0.849,0
+            c-0.235,0.235-0.235,0.615,0,0.85l2.823,2.25c0.122,0.121,0.282,0.177,0.441,0.172c0.159,0.005,0.32-0.051,0.44-0.172l2.25-2.25
+            C19.539,10.225,19.539,9.845,19.305,9.61z M10.288,15.752c-3.177,0-5.751-2.575-5.751-5.752c0-0.276,0.025-0.547,0.062-0.813
+            l1.203,1.203c0.235,0.234,0.615,0.234,0.85,0c0.234-0.235,0.234-0.615,0-0.85l-2.25-2.25C4.281,7.169,4.121,7.114,3.961,7.118
+            C3.802,7.114,3.642,7.169,3.52,7.291l-2.824,2.25c-0.234,0.235-0.234,0.615,0,0.85c0.235,0.234,0.615,0.234,0.85,0l1.957-1.559
+            C3.435,9.212,3.386,9.6,3.386,10c0,3.812,3.09,6.901,6.902,6.901c2.083,0,3.946-0.927,5.212-2.387l-0.898-0.719
+            C13.547,14.992,12.008,15.752,10.288,15.752z"></path>
+        </svg>
+      </button>
+      <button onclick="downloadShot()">Download Shot</button>
+      <!-- <span class="icon-search"></span> -->
+      <br />
+      <div style="max-width: 100%;">
+        <h2 id="shot-details"></h2>
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+    <input type="checkbox" id="collapse-section3" aria-hidden="true">
+    <label for="collapse-section3" aria-hidden="true">Profiles</label>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-6">
+          <h2>Installed Profiles</h2>
+          <select id="profiles" onchange="loadSelectedProfile()"> </select>
+          <button onclick="loadProfiles()">
+            <svg class="svg-icon" viewBox="0 0 20 20">
+              <path fill="none" d="M19.305,9.61c-0.235-0.235-0.615-0.235-0.85,0l-1.339,1.339c0.045-0.311,0.073-0.626,0.073-0.949
+                c0-3.812-3.09-6.901-6.901-6.901c-2.213,0-4.177,1.045-5.44,2.664l0.897,0.719c1.053-1.356,2.693-2.232,4.543-2.232
+                c3.176,0,5.751,2.574,5.751,5.751c0,0.342-0.037,0.675-0.095,1l-1.746-1.39c-0.234-0.235-0.614-0.235-0.849,0
+                c-0.235,0.235-0.235,0.615,0,0.85l2.823,2.25c0.122,0.121,0.282,0.177,0.441,0.172c0.159,0.005,0.32-0.051,0.44-0.172l2.25-2.25
+                C19.539,10.225,19.539,9.845,19.305,9.61z M10.288,15.752c-3.177,0-5.751-2.575-5.751-5.752c0-0.276,0.025-0.547,0.062-0.813
+                l1.203,1.203c0.235,0.234,0.615,0.234,0.85,0c0.234-0.235,0.234-0.615,0-0.85l-2.25-2.25C4.281,7.169,4.121,7.114,3.961,7.118
+                C3.802,7.114,3.642,7.169,3.52,7.291l-2.824,2.25c-0.234,0.235-0.234,0.615,0,0.85c0.235,0.234,0.615,0.234,0.85,0l1.957-1.559
+                C3.435,9.212,3.386,9.6,3.386,10c0,3.812,3.09,6.901,6.902,6.901c2.083,0,3.946-0.927,5.212-2.387l-0.898-0.719
+                C13.547,14.992,12.008,15.752,10.288,15.752z"></path>
+            </svg>
+          </button>
+          <button onclick="downloadProfile()">Download</button>
+          <div>
+            <h4 id="profile-title"></h4>
+            <span id="profile-description"></span>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div>
+            <h2>Upload Profiles</h2>
+            <form id="Form">
+              <input type="file" id="profileInput"/>
+            </form>
+            <!-- <form id="shot-upload-form" enctype="multipart/form-data" action="/api/profil" accept-charset="UTF-8" method="post">
+            </form> -->
+            
+            <button onclick="uploadProfile()">Upload Profile</button>
+          </div>
+        </div>
+      </div>  
+    </div>
+    
+      <input type="checkbox" id="collapse-section4" aria-hidden="true">
+      <label for="collapse-section4" aria-hidden="true">API Documentation</label>
+      <div id="doc">
+        <ul id="doc-list"></ul>
+        
+      </div>
+      
+
+   
+  </div>
+  
+</body>
+
+</html>
