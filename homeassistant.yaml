@@ -4,6 +4,15 @@ sensor:
     resource: http://DECENT-TABLET-IP:8888/api/status/details
     name: Decent Espresso Status
     scan_interval: 10 
+    value_template: "1" # This is a workaround for a bug. It does not allow a value of more than 255 characters.
+    json_attributes:
+      - state
+      - substate
+      - espresso_count
+      - head_temperature
+      - profile
+
+I just thought this isn't needed anymore. I will add it again to the file.
     json_attributes:
       - state
       - substate
