@@ -22,7 +22,7 @@ I talked to both and with their "blessing" I combined both ideas and added mine 
 There is a documentation about all available API endpoints in the attached json - which is also displayed in the Web UI.
 
 ## Web UI
-Navigate to http://<DECENT-IP>:8888 in your preferred browser.
+Navigate to http://DECENT-IP:8888 in your preferred browser. The port can be changed in the settings. 8080 should be prevented if it is used with the webcast feature.
 
 ## Home Assistant
 There is a yaml file available with an example configuration for Home Assistant (https://home-assistant.io).
