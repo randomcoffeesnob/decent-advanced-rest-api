@@ -19,10 +19,10 @@ I talked to both and with their "blessing" I combined both ideas and added mine 
 * Activate the plugin in the app settings.
 
 ## API
-There is a documentation about all available endpoints in the attached json - which is also displayed in the Web UI
+There is a documentation about all available API endpoints in the attached json - which is also displayed in the Web UI.
 
 ## Web UI
-navigate to the 
+Navigate to http://<DECENT-IP>:8888 in your preferred browser.
 
 ## Home Assistant
 There is a yaml file available with an example configuration for Home Assistant (https://home-assistant.io).
