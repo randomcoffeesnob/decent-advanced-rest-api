@@ -22,8 +22,8 @@
       stroke: #444;
       stroke-width: 1;
     }
-    
-   
+
+
   </style>
   <script>
 
@@ -51,13 +51,13 @@
 
       fetch(url, {
           method: 'POST',
-          mode: 'cors', 
+          mode: 'cors',
           cache: 'no-cache',
-          credentials: 'same-origin', 
+          credentials: 'same-origin',
           headers: {'Content-Type': 'application/json'},
-          redirect: 'follow', 
-          referrerPolicy: 'no-referrer', 
-          body: JSON.stringify(data) 
+          redirect: 'follow',
+          referrerPolicy: 'no-referrer',
+          body: JSON.stringify(data)
         });
       }
 
@@ -126,19 +126,28 @@
 
     function uploadProfile() {
      var url = address + '/api/profile';
-      
+
       var input = document.getElementById("profileInput");
       var file = input.files[0];
-     
+
         fetch(url, {
           method: 'POST',
-          mode: 'cors', 
+          mode: 'cors',
           cache: 'no-cache',
           credentials: 'same-origin',
-          headers: {'Content-Type': 'text/plain'}, 
-          redirect: 'follow', 
-          referrerPolicy: 'no-referrer', 
+          headers: {'Content-Type': 'text/plain'},
+          redirect: 'follow',
+          referrerPolicy: 'no-referrer',
           body: file
+        })
+        .then(response => {
+          if (response.status == 200) {
+          document.getElementById("modal-content").innerText = "Profile uploaded successful"
+        }
+        else {
+            document.getElementById("modal-content").innerText = "Profile upload error"
+        }
+          document.getElementById("modal-control").checked = true;
         });
     }
 
@@ -217,7 +226,7 @@
             });
             window.chart.update();
 
-            
+
           });
       }
     }
@@ -299,7 +308,7 @@
             t.endpoints.forEach(
               e => {
                 document.getElementById('doc-list').insertAdjacentHTML('beforeend','<li><mark class="inline-block">' + e.method + '</mark> ' + e.path + ' - <span style="font-style: italic;">' + e.description + '</span></li>');
-              });       
+              });
             });
     }
 
@@ -379,7 +388,7 @@
     <a href="#" class="button">Profiles</a>
     <a href="#" class="button">Shots</a> -->
   </header>
- 
+
   <div class="collapse">
     <input type="checkbox" id="collapse-section1" checked aria-hidden="true">
     <label for="collapse-section1" aria-hidden="true">Status</label>
@@ -453,24 +462,31 @@
             </form>
             <!-- <form id="shot-upload-form" enctype="multipart/form-data" action="/api/profil" accept-charset="UTF-8" method="post">
             </form> -->
-            
+
             <button onclick="uploadProfile()">Upload Profile</button>
           </div>
         </div>
-      </div>  
+      </div>
     </div>
-    
+
       <input type="checkbox" id="collapse-section4" aria-hidden="true">
       <label for="collapse-section4" aria-hidden="true">API Documentation</label>
       <div id="doc">
         <ul id="doc-list"></ul>
-        
-      </div>
-      
 
-   
+      </div>
+
+
+
   </div>
-  
+  <input type="checkbox" id="modal-control" class="modal">
+<div>
+  <div class="card">
+    <label for="modal-control" class="modal-close" ></label>
+    <h3 class="section">Info</h3>
+    <p id="modal-content" class="section">This is a modal dialog!</p>
+  </div>
+</div>
 </body>
 
 </html>
