@@ -1,0 +1,31 @@
+{
+    "accessories": [
+        {
+            "accessory": "HTTP-SWITCH",
+            "name": "Decent DE1",
+            "switchType": "stateful",
+            "onUrl": {
+                "url": "http://DECENT-IP:8888/api/status",
+                "method": "POST",
+                "body": "{\"active\": \"true\"}",
+                "headers": {
+                    "Content-Type": "application/json"
+                }
+            },
+            "offUrl": {
+                "url": "http://DECENT-IP:8888/api/status",
+                "method": "POST",
+                "body": "{\"active\": \"false\"}",
+                "headers": {
+                    "Content-Type": "application/json"
+                }
+            },
+            "statusUrl": {
+                "url": "http://DECENT-IP:8888/api/status",
+                "statusPattern": "{\"is_active\":\"true\"(,\"espresso_count\":[0-9]+,\"steaming_count\":[0-9]+})?",
+                "method": "GET"
+            }
+        
+        }
+    ]
+}
