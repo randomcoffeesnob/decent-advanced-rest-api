@@ -27,6 +27,11 @@ Navigate to http://DECENT-IP:8888 in your preferred browser. The port can be cha
 ## Home Assistant
 There is a yaml file available with an example configuration for Home Assistant (https://home-assistant.io).
 
+## Homebridge
+As requested I added a Homebridge accessory config.
+* install the Homebridge Http Switch Plugin (https://github.com/Supereg/homebridge-http-switch)
+* create a new device and add the example configuration
+
 # To Do
 - [ ] adding the auth key to the web UI
 - [ ] adding an endpoint to activate a specific profile
