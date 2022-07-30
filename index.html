@@ -30,6 +30,15 @@
     var address = location.origin != "null" ? location.origin : "http://127.0.0.1:8080";
     window.addEventListener("load", onLoad);
 
+    // monkey patch fetch to provide auth key, if given
+    const origFetch = window.fetch;
+    window.fetch = function() {
+      const url = new URL(arguments[0])
+      url.searchParams.append('auth', (new URL(document.location)).searchParams.get('auth'));
+      arguments[0] = url.href;
+      return origFetch.apply(this, arguments);
+    }
+    
     function onLoad() {
       updateTimer();
       loadShots();
