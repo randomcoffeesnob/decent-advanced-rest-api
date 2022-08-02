@@ -1,5 +1,6 @@
-package require de1_machine
+package require de1_machine 1.2
 package require json
+package require de1_profile 2.0
 
 set plugin_name "advanced_rest_api"
 
@@ -7,7 +8,7 @@ namespace eval ::plugins::${plugin_name} {
 
     variable author "Yannick Dietler"
     variable contact "ydt@ydt.ch"
-    variable version 1.0
+    variable version 1.1
     variable description "API to control the DE1's power state and getting additional Information"
     variable name "Advanced REST API"
 
@@ -188,7 +189,7 @@ namespace eval ::plugins::${plugin_name} {
 		dict set return "substate" $::de1_substate_types($::de1(substate))
 		switch -- $::de1_num_state($::de1(state)) {
 			"Idle" {
-				dict set return "profile" $::settings(original_profile_title)
+				dict set return "profile" [::profile::filename_from_title $::settings(profile_title)]
 				dict set return "espresso_count" $::settings(espresso_count)
 				dict set return "steaming_count" $::settings(steaming_count)
 				dict set return "bean_brand" $::settings(bean_brand)
@@ -196,7 +197,7 @@ namespace eval ::plugins::${plugin_name} {
 				dict set return "bean_notes" $::settings(bean_notes)
 				dict set return "roast_date" $::settings(roast_date)
 				dict set return "roast_level" $::settings(roast_level)
-				dict set return "skin" $::settings(skin)
+				dict set return "skin" [::profile::filename_from_title $::settings(skin)]
 				dict set return "head_temperature" $::de1(head_temperature)
 				dict set return "mix_temperature" $::de1(mix_temperature)
 				dict set return "steam_heater_temperature" $::de1(steam_heater_temperature)

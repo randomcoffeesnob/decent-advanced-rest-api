@@ -10,7 +10,6 @@ I talked to both and with their "blessing" I combined both ideas and added mine 
 * change the state to standby or enable it
 * get, display or download shot files
 * get, download or upload profiles
-* flush the log
 
 
 # How to use it?
@@ -32,10 +31,6 @@ As requested I added a Homebridge accessory config.
 * install the Homebridge Http Switch Plugin (https://github.com/Supereg/homebridge-http-switch)
 * create a new device and add the example configuration
 
-# To Do
-- [ ] adding the auth key to the web UI
-- [ ] adding an endpoint to activate a specific profile
-- [ ] adding compatibility to the new json files in the coming releases of the Decent app
 
 ... please contact me for feature requests. 
 
