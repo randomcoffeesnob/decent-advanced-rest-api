@@ -188,7 +188,6 @@ namespace eval ::plugins::${plugin_name} {
 		set json_structure {dict state string}
 		dict set return "state" $::de1_num_state($::de1(state))
 		dict set return "substate" $::de1_substate_types($::de1(substate))
-		
 		switch -- $::de1_num_state($::de1(state)) {
 			"Idle" {
 				dict set return "profile" [::profile::filename_from_title $::settings(profile_title)]
