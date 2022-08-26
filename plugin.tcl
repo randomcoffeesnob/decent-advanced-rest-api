@@ -1,6 +1,7 @@
 package require de1_machine 1.2
 package require json
 package require de1_profile 2.0
+package require de1_vars 1.0
 
 set plugin_name "advanced_rest_api"
 
@@ -8,7 +9,7 @@ namespace eval ::plugins::${plugin_name} {
 
     variable author "Yannick Dietler"
     variable contact "ydt@ydt.ch"
-    variable version 1.1
+    variable version 1.2
     variable description "API to control the DE1's power state and getting additional Information"
     variable name "Advanced REST API"
 
@@ -201,6 +202,7 @@ namespace eval ::plugins::${plugin_name} {
 				dict set return "head_temperature" $::de1(head_temperature)
 				dict set return "mix_temperature" $::de1(mix_temperature)
 				dict set return "steam_heater_temperature" $::de1(steam_heater_temperature)
+				dict set return "water_level" [water_tank_level_to_milliliters $::de1(water_level)] [translate mL]
 			}
 			"Espresso" {
 				foreach key [list "espresso_elapsed" "espresso_pressure" "espresso_weight" "espresso_flow" "espresso_flow_weight" "espresso_temperature_basket" "espresso_temperature_mix"] {
