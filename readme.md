@@ -31,6 +31,9 @@ As requested I added a Homebridge accessory config.
 * install the Homebridge Http Switch Plugin (https://github.com/Supereg/homebridge-http-switch)
 * create a new device and add the example configuration
 
+Update: there is now a better way to integrate this plugin with Homebridge: https://github.com/muelmx/homebridge-decent-advanced-rest-api / https://www.npmjs.com/package/homebridge-decent-advanced-rest-api
+Many thanks to muelmx :-)
+
 
 ... please contact me for feature requests. 
 
