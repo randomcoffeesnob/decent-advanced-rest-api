@@ -41,6 +41,11 @@
             "description": "add a profile to your machine - the filename will be the current timestamp so nothing should be overwritten"
         },
         {
+            "method": "PUT",
+            "path": "/api/profile/{profile_filename.tcl}",
+            "description": "Select an existing profile"
+        },
+        {
             "method": "GET",
             "path": "/",
             "description": "Dashboard including most API functions"

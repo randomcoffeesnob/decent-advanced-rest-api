@@ -141,20 +141,41 @@ namespace eval ::plugins::${plugin_name} {
 		if {$method eq "GET"} {
 		set path [dict get $state request path]
 		set profile [lindex [split $path "/"] 3]
-		
+		#Load all saved profiles as a list
+		set savedprofiles [glob -tails -directory [pwd]/profiles/ *.tcl]
 
 		if {$profile != ""} {
-			set fd [open "[pwd]/profiles/$profile" r]
-			fconfigure $fd -translation binary
-			set content [read $fd]; close $fd
-			# ::wibble::return_200_json   [::wibble::compile_json {dict} $content]
-			::wibble::return_200_json $content
+			#Only return profile information if the profile exists
+			if {$profile in $savedprofiles} {
+				set fd [open "[pwd]/profiles/$profile" r]
+				fconfigure $fd -translation binary
+				set content [read $fd]; close $fd
+				# ::wibble::return_200_json   [::wibble::compile_json {dict} $content]
+				::wibble::return_200_json $content
+			} else {
+				#If a profile is specified but does not exist, return all profiles
+				::wibble::return_200_json [::wibble::compile_json {list} $savedprofiles]
+			}
 		} else {
-			::wibble::return_200_json [::wibble::compile_json {list} [glob -tails -directory [pwd]/profiles/ *.tcl]]
+			#If no profile was specified, return all profiles
+			::wibble::return_200_json [::wibble::compile_json {list} $savedprofiles]
 		}
 		}
+		#Set a profile
 		if {$method eq "PUT"} {
-			#change the profile to ?
+			set path [dict get $state request path]
+			set profile [lindex [split $path "/"] 3]
+			#Load all saved profiles as a list
+			set savedprofiles [glob -tails -directory [pwd]/profiles/ *.tcl]
+			#Only set the profile if it exists
+			if {$profile in $savedprofiles} {
+				#The select_profile procedure accepts the profile name without file extension (.tcl)
+				set rootname [file rootname [file tail $profile]]
+				select_profile $rootname
+				::wibble::return_200_json "$profile"
+			} else {
+				::wibble::return_200_json [::wibble::compile_json {list} $savedprofiles]
+			}
 		}
 		
 	}

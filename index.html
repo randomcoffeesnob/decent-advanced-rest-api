@@ -276,6 +276,19 @@
         }
     }
 
+    function setSelectedProfile () {
+      let selected = document.getElementById("profiles").value;
+      if (!selected) {
+        window.chart.data.datasets.forEach(ds => ds.data = null);
+        window.chart.update();
+      } else {
+        fetch(address + "/api/profile/" + selected, {method: 'PUT'}).then(r => r.text())
+          .then(t => {
+            console.log(t);
+          })
+        }
+    }
+
     function downloadShot(){
       let selected = document.getElementById("shots").value;
       if (!selected) {
@@ -458,6 +471,7 @@
             </svg>
           </button>
           <button onclick="downloadProfile()">Download</button>
+          <button onclick="setSelectedProfile()">Set Profile</button>
           <div>
             <h4 id="profile-title"></h4>
             <span id="profile-description"></span>
