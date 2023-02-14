@@ -1,0 +1,48 @@
+# Put this into your homeassistant configuration.yaml file
+# Replace both instances <YOUR-DECENT-TABLET-IP> with the IP address of the tablet on your Decent machine   
+
+rest:
+    - resource: http://<YOUR-DECENT-TABLET-IP>:8888/api/status/details
+      scan_interval: 2
+      sensor:
+      - name: Decent Espresso State
+        unique_id: decentespresso_state
+        value_template: "{{ value_json.state }}"
+      - name: Decent Espresso Substate
+        unique_id: decentespresso_substate
+        value_template: "{{ value_json.substate }}"
+      - name: Decent Espresso Shot Count
+        unique_id: decentespresso_espresso_count
+        value_template: "{{ value_json.espresso_count|is_defined }}"
+      - name: Decent Espresso Steam Count
+        unique_id: decentespresso_steaming_count
+        value_template: "{{ value_json.steaming_count|is_defined }}"
+      - name: Decent Espresso Head Temperature
+        unique_id: decentespresso_head_temp
+        value_template: "{{ value_json.head_temperature|default(0)|round(1) }}"
+        unit_of_measurement: "ºC"
+      - name: Decent Espresso Mix Temperature
+        unique_id: decentespresso_mix_temp
+        value_template: "{{ value_json.mix_temperature|default(0)|round(1) }}"
+        unit_of_measurement: "ºC"
+      - name: Decent Espresso Steam Temperature
+        unique_id: decentespresso_steam_temp
+        value_template: "{{ value_json.steam_heater_temperature|default(0)|round(1) }}"
+        unit_of_measurement: "ºC"
+      - name: Decent Espresso Water Level
+        unique_id: decentespresso_water_level
+        value_template: "{{ value_json.water_level|replace(' mL', '')|default(0) }}"
+        unit_of_measurement: ml
+      - name: Decent Espresso Profile
+        unique_id: decentespresso_profile
+        value_template: "{{ value_json.profile|replace('_', ' ') }}"
+
+switch:
+    - platform: rest
+      name: "Decent Espresso"
+      resource: http://<YOUR-DECENT-TABLET-IP>:8888/api/status
+      body_on: '{"active": "true"}'
+      body_off: '{"active": "false"}'
+      is_on_template: "{{ value_json.is_active }}"
+      headers:
+          Content-Type: application/json
