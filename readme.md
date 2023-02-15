@@ -24,7 +24,7 @@ There is a documentation about all available API endpoints in the attached json 
 Navigate to http://DECENT-IP:8888 in your preferred browser. The port can be changed in the settings. 8080 should be prevented if it is used with the webcast feature.
 
 ## Home Assistant
-There is a yaml file available with an example configuration for Home Assistant (https://home-assistant.io).
+There is example configuration for Home Assistant (https://home-assistant.io) in the [homeassistant](./homeassistant) directory.
 
 ## Homebridge
 As requested I added a Homebridge accessory config.

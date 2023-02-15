@@ -1,0 +1,77 @@
+# This is an example of a lovelace card stack to display the values
+# gathered via the rest sensor.
+# To use this, go into edit mode on your dashboard,
+# click "Add Card", select "Manual" (at the bottom) and paste the code below
+
+type: vertical-stack
+cards:
+    - type: grid
+      columns: 2
+      square: false
+      cards:
+          - type: tile
+            entity: switch.decent_espresso
+            icon: mdi:coffee-maker-outline
+      - type: tile
+        entity: sensor.decent_espresso_profile
+        name: Profile
+        icon: mdi:progress-wrench
+  - square: false
+    columns: 2
+    type: grid
+    cards:
+        - type: tile
+          entity: sensor.decent_espresso_state
+          name: State
+          icon: mdi:coffee-maker-outline
+      - type: tile
+        entity: sensor.decent_espresso_substate
+        name: Substate
+        icon: mdi:list-status
+  - square: false
+    columns: 4
+    type: grid
+    cards:
+        - type: gauge
+          entity: sensor.decent_espresso_head_temperature
+          name: Head
+          max: 105
+      - type: gauge
+        entity: sensor.decent_espresso_mix_temperature
+        name: Mix
+        max: 105
+      - type: gauge
+        entity: sensor.decent_espresso_steam_temperature
+        max: 175
+        name: Steam
+      - type: gauge
+        needle: true
+        entity: sensor.decent_espresso_water_level
+        name: Water
+        max: 1500
+        unit: ml
+        segments:
+          - from: 0
+            color: var(--error-color)
+          - from: 200
+            color: var(--warning-color)
+          - from: 500
+            color: var(--success-color)
+  - square: false
+    columns: 2
+    type: grid
+    cards:
+        - hours_to_show: 24
+          graph: line
+          type: sensor
+          detail: 1
+          entity: sensor.decent_espresso_shot_count
+          name: Shot Count
+          icon: mdi:coffee-outline
+      - hours_to_show: 24
+        graph: line
+        type: sensor
+        detail: 1
+        entity: sensor.decent_espresso_steam_count
+        name: Steam Count
+        icon: mdi:kettle-steam-outline
