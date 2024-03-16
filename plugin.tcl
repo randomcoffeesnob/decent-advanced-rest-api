@@ -58,7 +58,7 @@ namespace eval ::plugins::${plugin_name} {
 	proc ::wibble::return_200_json {content} {
 		dict set response status 200
 		dict set state response header content-type "" {application/json charset utf-8}
-		dict set response content "$content"
+		dict set response content "$content\n"
 		sendresponse $response
 	}
 	# from https://wiki.tcl-lang.org/page/JSON
