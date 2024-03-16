@@ -63,7 +63,7 @@ namespace eval ::plugins::${plugin_name} {
 	}
 	# from https://wiki.tcl-lang.org/page/JSON
 	proc ::wibble::compile_json {spec data} {
-      while [llength $spec] {
+      while {[llength $spec]} {
           set type [lindex $spec 0]
           set spec [lrange $spec 1 end]
 
