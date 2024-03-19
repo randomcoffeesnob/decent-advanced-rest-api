@@ -2,6 +2,8 @@
 # Replace both instances <YOUR-DECENT-TABLET-IP> with the IP address of the tablet on your Decent machine   
 
 rest:
+    # when using webserver_authentication 1
+    #- resource: http://<YOUR-DECENT-TABLET-IP>:8888/api/status/details?auth=myFancyAuthenticationKey
     - resource: http://<YOUR-DECENT-TABLET-IP>:8888/api/status/details
       scan_interval: 2
       sensor:
@@ -41,6 +43,8 @@ switch:
     - platform: rest
       name: "Decent Espresso"
       resource: http://<YOUR-DECENT-TABLET-IP>:8888/api/status
+      # when using webserver_authentication 1
+      #resource: http://<YOUR-DECENT-TABLET-IP>:8888/api/status?auth=myFancyAuthenticationKey
       body_on: '{"active": "true"}'
       body_off: '{"active": "false"}'
       is_on_template: "{{ value_json.is_active }}"

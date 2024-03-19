@@ -5,13 +5,13 @@
 
 type: vertical-stack
 cards:
-    - type: grid
-      columns: 2
-      square: false
-      cards:
-          - type: tile
-            entity: switch.decent_espresso
-            icon: mdi:coffee-maker-outline
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: tile
+        entity: switch.decent_espresso
+        icon: mdi:coffee-maker-outline
       - type: tile
         entity: sensor.decent_espresso_profile
         name: Profile
@@ -20,10 +20,10 @@ cards:
     columns: 2
     type: grid
     cards:
-        - type: tile
-          entity: sensor.decent_espresso_state
-          name: State
-          icon: mdi:coffee-maker-outline
+      - type: tile
+        entity: sensor.decent_espresso_state
+        name: State
+        icon: mdi:coffee-maker-outline
       - type: tile
         entity: sensor.decent_espresso_substate
         name: Substate
@@ -32,10 +32,10 @@ cards:
     columns: 4
     type: grid
     cards:
-        - type: gauge
-          entity: sensor.decent_espresso_head_temperature
-          name: Head
-          max: 105
+      - type: gauge
+        entity: sensor.decent_espresso_head_temperature
+        name: Head
+        max: 105
       - type: gauge
         entity: sensor.decent_espresso_mix_temperature
         name: Mix
@@ -61,13 +61,13 @@ cards:
     columns: 2
     type: grid
     cards:
-        - hours_to_show: 24
-          graph: line
-          type: sensor
-          detail: 1
-          entity: sensor.decent_espresso_shot_count
-          name: Shot Count
-          icon: mdi:coffee-outline
+      - hours_to_show: 24
+        graph: line
+        type: sensor
+        detail: 1
+        entity: sensor.decent_espresso_shot_count
+        name: Shot Count
+        icon: mdi:coffee-outline
       - hours_to_show: 24
         graph: line
         type: sensor
