@@ -205,6 +205,24 @@
               time_temperatureGoal.push({ x: time[i], y: temperatureGoal[i] / 10 });
             }
 
+            var weightFlow = extractArray(t, "espresso_flow_weight");
+            var time_weightFlow = new Array(time.length);
+            time_weightFlow.fill(0);
+            if (weightFlow) {
+              for (var i = 0; i < time.length; i++) {
+                time_weightFlow[i] = { x: time[i], y: weightFlow[i] };
+              }
+            }
+
+            var weight = extractArray(t, "espresso_weight");
+            var time_weight = new Array(time.length);
+            time_weight.fill(0);
+            if (weight) {
+              for (var i = 0; i < time.length; i++) {
+                time_weight[i] = { x: time[i], y: weight[i] / 10 };
+              }
+            }
+
             var profile = extractString(t, "profile");
             var duration = time[time.length];
             document.getElementById('shot-details').innerText = profile;
@@ -231,6 +249,12 @@
                 case 'temperature-goal':
                   dataset.data = time_temperatureGoal;
                   break;
+                case 'weight-flow':
+                  dataset.data = time_weightFlow;
+                  break;
+                case 'weight':
+                  dataset.data = time_weight;
+                  break
               }
             });
             window.chart.update();
@@ -383,6 +407,18 @@
             borderColor: 'rgb(220,20,60)',
             borderDash: borderDash,
             pointRadius: 0
+          }, {
+            showLine: true,
+            fill: false,
+            label: 'weight-flow',
+            borderColor: 'rgb(200,20,200)',
+            pointRadius: pointRadius
+          }, {
+            showLine: true,
+            fill: false,
+            label: 'weight',
+            borderColor: 'rgb(100,20,100)',
+            pointRadius: pointRadius
           }]
         },
 
