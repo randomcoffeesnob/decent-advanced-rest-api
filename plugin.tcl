@@ -130,8 +130,14 @@ namespace eval ::plugins::${plugin_name} {
 		}
 		set method [dict get $state request method]		
 		if {$method eq "POST"} {
+      set rawheaders [dict get $state request rawheader]
+      set filenameIndex [lsearch $rawheaders "filename:*"]
+      if {$filenameIndex == -1 } {
+        set localfilename "[clock seconds].tcl"  
+      } else {
+        set localfilename  [lindex [split [lindex $rawheaders $filenameIndex] ": "] end]
+      }
 			set postdata [dict get $state request rawpost]
-			set localfilename "[clock seconds].tcl"
 			set path "[pwd]/profiles/$localfilename"
 			set fileId [open $path "w"]
 			puts -nonewline $fileId $postdata
