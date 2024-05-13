@@ -225,7 +225,7 @@
 
             var profile = extractString(t, "profile");
             var duration = time[time.length];
-            document.getElementById('shot-details').innerText = profile;
+            document.getElementById('shot-details-title').innerText = profile;
 
 
             //update chart
@@ -258,11 +258,120 @@
               }
             });
             window.chart.update();
-
-
           });
       }
     }
+
+    function loadSelectedShot_v2() {
+        let selected = document.getElementById("shots").value;
+        if (!selected) {
+          window.chart.data.datasets.forEach(ds => ds.data = null);
+          window.chart.update();
+          return;
+        }
+          fetch(address + "/api/v2/shot/" + selected + '?download=true').then(r => r.json())
+            .then(t => {
+              console.log("loaded: ", t)
+              var time = t.elapsed;
+              var pressure = t.pressure.pressure;
+              var time_pressure = new Array();
+              for (var i = 0; i < time.length; i++) {
+                time_pressure.push({ x: time[i], y: pressure[i] });
+              }
+              var pressureGoal = t.pressure.goal;
+              var time_pressureGoal = new Array();
+              for (var i = 0; i < time.length; i++) {
+                let goal = pressureGoal[i];
+
+                time_pressureGoal.push({ x: time[i], y: goal >= 0 ? goal : NaN });
+              }
+
+              var flow = t.flow.flow;
+              var time_flow = new Array();
+              for (var i = 0; i < time.length; i++) {
+                time_flow.push({ x: time[i], y: flow[i] });
+              }
+              var flowGoal = t.flow.goal;
+              var time_flowGoal = new Array();
+              for (var i = 0; i < time.length; i++) {
+                let goal = flowGoal[i];
+                time_flowGoal.push({ x: time[i], y: goal >= 0 ? goal : NaN });
+              }
+
+              var temperature = t.temperature.basket;
+              var time_temperature = new Array();
+              for (var i = 0; i < time.length; i++) {
+                time_temperature.push({ x: time[i], y: temperature[i] / 10 });
+              }
+              var temperatureGoal = t.temperature.goal;
+              var time_temperatureGoal = new Array();
+              for (var i = 0; i < time.length; i++) {
+                time_temperatureGoal.push({ x: time[i], y: temperatureGoal[i] / 10 });
+              }
+
+              var weightFlow = t.flow.by_weight;
+              var time_weightFlow = new Array(time.length);
+              time_weightFlow.fill(0);
+              if (weightFlow) {
+                for (var i = 0; i < time.length; i++) {
+                  time_weightFlow[i] = { x: time[i], y: weightFlow[i] };
+                }
+              }
+
+              var weight = t.totals.weight;
+              var time_weight = new Array(time.length);
+              time_weight.fill(0);
+              if (weight) {
+                for (var i = 0; i < time.length; i++) {
+                  time_weight[i] = { x: time[i], y: weight[i] / 10 };
+                }
+              }
+
+              var profile = t.profile.title;
+              var duration = time[time.length];
+              var profileMessage =
+              `dose in: ${t.meta.in}, out: ${t.meta.out}, in ${t.meta.time}s\n` +
+              `beans: ${t.meta.bean.brand} ${t.meta.bean.type}\n` +
+              `grinder: ${t.meta.grinder.model} @ ${t.meta.grinder.setting}\n`// +
+              // TODO: enjoyment and notes are not propagated?
+              // `score: ${t.meta.shot.enjoyment}, notes: ${t.meta.shot.notes}`
+
+              document.getElementById('shot-details-title').innerText = profile;
+              document.getElementById('shot-details-content').innerText = profileMessage
+
+
+              //update chart
+              window.chart.data.datasets.forEach(dataset => {
+                switch (dataset.label) {
+                  case 'pressure':
+                    dataset.data = time_pressure;
+                    break;
+                  case 'pressure-goal':
+                    dataset.data = time_pressureGoal;
+                    break;
+                  case 'flow':
+                    dataset.data = time_flow;
+                    break;
+                  case 'flow-goal':
+                    dataset.data = time_flowGoal;
+                    break;
+                  case 'temperature':
+                    dataset.data = time_temperature;
+                    break;
+                  case 'temperature-goal':
+                    dataset.data = time_temperatureGoal;
+                    break;
+                  case 'weight-flow':
+                    dataset.data = time_weightFlow;
+                    break;
+                  case 'weight':
+                    dataset.data = time_weight;
+                    break
+                }
+              });
+              window.chart.update();
+            });
+      }
 
     function loadSelectedProfile () {
       let selected = document.getElementById("profiles").value;
@@ -464,7 +573,7 @@
     <label for="collapse-section2" aria-hidden="true">Shots</label>
     <div style="max-height: 100%;">
 
-      <select id="shots" onchange="loadSelectedShot()"> </select>
+      <select id="shots" onchange="loadSelectedShot_v2()"> </select>
       <button onclick="loadShots()">
         <svg class="svg-icon" viewBox="0 0 20 20">
           <path fill="none" d="M19.305,9.61c-0.235-0.235-0.615-0.235-0.85,0l-1.339,1.339c0.045-0.311,0.073-0.626,0.073-0.949
@@ -482,7 +591,8 @@
       <!-- <span class="icon-search"></span> -->
       <br />
       <div style="max-width: 100%;">
-        <h2 id="shot-details"></h2>
+        <h2 id="shot-details-title"></h2>
+        <p id="shot-details-content"></p>
         <canvas id="myChart"></canvas>
       </div>
     </div>
