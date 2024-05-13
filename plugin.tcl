@@ -207,6 +207,25 @@ namespace eval ::plugins::${plugin_name} {
 		}
 	}
 
+    #history v2
+  proc ::wibble::history_v2 {state} {
+    if { ![check_auth $state] } {
+			return;
+		}
+		set path [dict get $state request path]
+		set shot [lindex [split $path "/"] 4]
+    append shotName [lindex [split $shot "."] 0] ".json"
+
+    if {$shotName != ""} {
+			set fd [open "[pwd]/history_v2/$shotName" r]
+			fconfigure $fd -translation binary
+			set content [read $fd]; close $fd
+			::wibble::return_200_json $content
+		} else {
+      ::wibble::return_200_json
+    }
+  }
+
 	# based on https://github.com/Testsubject1683/de1-mirror/tree/webapi
 	proc ::wibble::status {} {
 	
@@ -363,6 +382,7 @@ namespace eval ::plugins::${plugin_name} {
         ::wibble::handle /api/profile profile
 		::wibble::handle /api/shot history
 		::wibble::handle /api/help docs
+    ::wibble::handle /api/v2/shot history_v2
 		::wibble::handle / indexpage
 
 
