@@ -329,12 +329,13 @@
 
               var profile = t.profile.title;
               var duration = time[time.length];
+              var ratio = Math.round(t.meta.out / t.meta.in * 100) / 100;
               var profileMessage =
-              `dose in: ${t.meta.in}, out: ${t.meta.out}, in ${t.meta.time}s\n` +
+              `dose in: ${t.meta.in}, out: ${t.meta.out} (1:${ratio}), in ${t.meta.time}s\n` +
               `beans: ${t.meta.bean.brand} ${t.meta.bean.type}\n` +
-              `grinder: ${t.meta.grinder.model} @ ${t.meta.grinder.setting}\n`// +
+              `grinder: ${t.meta.grinder.model} @ ${t.meta.grinder.setting}\n` +
               // TODO: enjoyment and notes are not propagated?
-              // `score: ${t.meta.shot.enjoyment}, notes: ${t.meta.shot.notes}`
+              (typeof t.meta.shot.enjoyment !== "undefined" ? `score: ${t.meta.shot.enjoyment}, notes: ${t.meta.shot.notes}` : '')
 
               document.getElementById('shot-details-title').innerText = profile;
               document.getElementById('shot-details-content').innerText = profileMessage
