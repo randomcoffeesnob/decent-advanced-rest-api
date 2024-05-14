@@ -271,7 +271,6 @@
         }
           fetch(address + "/api/v2/shot/" + selected + '?download=true').then(r => r.json())
             .then(t => {
-              console.log("loaded: ", t)
               var time = t.elapsed;
               var pressure = t.pressure.pressure;
               var time_pressure = new Array();
@@ -334,8 +333,7 @@
               `dose in: ${t.meta.in}, out: ${t.meta.out} (1:${ratio}), in ${t.meta.time}s\n` +
               `beans: ${t.meta.bean.brand} ${t.meta.bean.type}\n` +
               `grinder: ${t.meta.grinder.model} @ ${t.meta.grinder.setting}\n` +
-              // TODO: enjoyment and notes are not propagated?
-              (typeof t.meta.shot.enjoyment !== "undefined" ? `score: ${t.meta.shot.enjoyment}, notes: ${t.meta.shot.notes}` : '')
+              `score: ${t.meta.shot.enjoyment}, notes: ${t.meta.shot.notes}`
 
               document.getElementById('shot-details-title').innerText = profile;
               document.getElementById('shot-details-content').innerText = profileMessage
