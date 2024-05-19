@@ -239,8 +239,8 @@
               var ratio = Math.round(t.meta.out / t.meta.in * 100) / 100;
               var profileMessage =
               `dose in: ${t.meta.in}, out: ${t.meta.out} (1:${ratio}), target: ${describedShot.target_drink_weight}g, in ${t.meta.time}s\n` +
-              `beans: ${t.meta.bean.brand} ${t.meta.bean.type}\n` +
-              `grinder: ${t.meta.grinder.model} @ ${t.meta.grinder.setting}\n` +
+              `beans: ${describedShot.bean_brand} ${describedShot.bean_type}\n` +
+              `grinder: ${describedShot.grinder_model} @ ${describedShot.grinder_setting}\n` +
               `score: ${describedShot.espresso_enjoyment}, notes: ${describedShot.espresso_notes}`
 
               document.getElementById('shot-details-title').innerText = profile;

@@ -244,6 +244,7 @@ namespace eval ::plugins::${plugin_name} {
         profile_title  [lindex $loadedShots(profile_title) $i] \
         bean_desc   [lindex $loadedShots(bean_desc) $i] \
         bean_brand    [lindex $loadedShots(bean_brand) $i] \
+        bean_type    [lindex $loadedShots(bean_type) $i] \
         bean_notes   [string map {\n \\n} [lindex $loadedShots(bean_notes) $i]] \
         drink_weight  [lindex $loadedShots(drink_weight) $i] \
         grinder_dose_weight   [lindex $loadedShots(grinder_dose_weight) $i] \
