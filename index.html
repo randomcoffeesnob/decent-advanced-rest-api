@@ -30,6 +30,8 @@
     var address = location.origin != "null" ? location.origin : "http://127.0.0.1:8080";
     window.addEventListener("load", onLoad);
 
+    var loadedShots = [];
+
     // monkey patch fetch to provide auth key, if given
     const origFetch = window.fetch;
     window.fetch = function() {
@@ -108,12 +110,16 @@
     function loadShots() {
       var x = document.getElementById("shots");
       x.options.length = 0
-      fetch(address + "/api/shot").then(r => r.json())
-        .then(j => j.sort().reverse().map((e) => {
-          var option = document.createElement("option");
-          option.text = e;
-          x.add(option);
-        })).then(e => {
+      fetch(address + "/api/v2/shots").then(r =>  r.json())
+        .then(j => {
+          loadedShots = j;
+          for (const k of j) {
+            var option = document.createElement("option");
+            option.text = k.shot_desc;
+            option.value = k.filename;
+            x.add(option);
+          }
+        }).then(e => {
           x.options[0].selected = true;
           x.onchange();
         });
@@ -160,108 +166,6 @@
         });
     }
 
-    function loadSelectedShot() {
-      let selected = document.getElementById("shots").value;
-      if (!selected) {
-        window.chart.data.datasets.forEach(ds => ds.data = null);
-        window.chart.update();
-      } else {
-        fetch(address + "/api/shot/" + selected + '?download=true').then(r => r.text())
-          .then(t => {
-            var time = extractArray(t, "espresso_elapsed");
-            var pressure = extractArray(t, "espresso_pressure");
-            var time_pressure = new Array();
-            for (var i = 0; i < time.length; i++) {
-              time_pressure.push({ x: time[i], y: pressure[i] });
-            }
-            var pressureGoal = extractArray(t, "espresso_pressure_goal");
-            var time_pressureGoal = new Array();
-            for (var i = 0; i < time.length; i++) {
-              let goal = pressureGoal[i];
-
-              time_pressureGoal.push({ x: time[i], y: goal >= 0 ? goal : NaN });
-            }
-
-            var flow = extractArray(t, "espresso_flow");
-            var time_flow = new Array();
-            for (var i = 0; i < time.length; i++) {
-              time_flow.push({ x: time[i], y: flow[i] });
-            }
-            var flowGoal = extractArray(t, "espresso_flow_goal");
-            var time_flowGoal = new Array();
-            for (var i = 0; i < time.length; i++) {
-              let goal = flowGoal[i];
-              time_flowGoal.push({ x: time[i], y: goal >= 0 ? goal : NaN });
-            }
-
-            var temperature = extractArray(t, "espresso_temperature_basket");
-            var time_temperature = new Array();
-            for (var i = 0; i < time.length; i++) {
-              time_temperature.push({ x: time[i], y: temperature[i] / 10 });
-            }
-            var temperatureGoal = extractArray(t, "espresso_temperature_goal");
-            var time_temperatureGoal = new Array();
-            for (var i = 0; i < time.length; i++) {
-              time_temperatureGoal.push({ x: time[i], y: temperatureGoal[i] / 10 });
-            }
-
-            var weightFlow = extractArray(t, "espresso_flow_weight");
-            var time_weightFlow = new Array(time.length);
-            time_weightFlow.fill(0);
-            if (weightFlow) {
-              for (var i = 0; i < time.length; i++) {
-                time_weightFlow[i] = { x: time[i], y: weightFlow[i] };
-              }
-            }
-
-            var weight = extractArray(t, "espresso_weight");
-            var time_weight = new Array(time.length);
-            time_weight.fill(0);
-            if (weight) {
-              for (var i = 0; i < time.length; i++) {
-                time_weight[i] = { x: time[i], y: weight[i] / 10 };
-              }
-            }
-
-            var profile = extractString(t, "profile");
-            var duration = time[time.length];
-            document.getElementById('shot-details-title').innerText = profile;
-
-
-            //update chart
-            window.chart.data.datasets.forEach(dataset => {
-              switch (dataset.label) {
-                case 'pressure':
-                  dataset.data = time_pressure;
-                  break;
-                case 'pressure-goal':
-                  dataset.data = time_pressureGoal;
-                  break;
-                case 'flow':
-                  dataset.data = time_flow;
-                  break;
-                case 'flow-goal':
-                  dataset.data = time_flowGoal;
-                  break;
-                case 'temperature':
-                  dataset.data = time_temperature;
-                  break;
-                case 'temperature-goal':
-                  dataset.data = time_temperatureGoal;
-                  break;
-                case 'weight-flow':
-                  dataset.data = time_weightFlow;
-                  break;
-                case 'weight':
-                  dataset.data = time_weight;
-                  break
-              }
-            });
-            window.chart.update();
-          });
-      }
-    }
-
     function loadSelectedShot_v2() {
         let selected = document.getElementById("shots").value;
         if (!selected) {
@@ -269,7 +173,11 @@
           window.chart.update();
           return;
         }
-          fetch(address + "/api/v2/shot/" + selected + '?download=true').then(r => r.json())
+
+        const describedShot = loadedShots.find(shot => shot.filename == selected)
+
+          fetch(address + "/api/v2/shot/" + selected + '?download=true')
+          .then(r => r.json())
             .then(t => {
               var time = t.elapsed;
               var pressure = t.pressure.pressure;
@@ -330,10 +238,10 @@
               var duration = time[time.length];
               var ratio = Math.round(t.meta.out / t.meta.in * 100) / 100;
               var profileMessage =
-              `dose in: ${t.meta.in}, out: ${t.meta.out} (1:${ratio}), in ${t.meta.time}s\n` +
+              `dose in: ${t.meta.in}, out: ${t.meta.out} (1:${ratio}), target: ${describedShot.target_drink_weight}g, in ${t.meta.time}s\n` +
               `beans: ${t.meta.bean.brand} ${t.meta.bean.type}\n` +
               `grinder: ${t.meta.grinder.model} @ ${t.meta.grinder.setting}\n` +
-              `score: ${t.meta.shot.enjoyment}, notes: ${t.meta.shot.notes}`
+              `score: ${describedShot.espresso_enjoyment}, notes: ${describedShot.espresso_notes}`
 
               document.getElementById('shot-details-title').innerText = profile;
               document.getElementById('shot-details-content').innerText = profileMessage

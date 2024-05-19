@@ -57,7 +57,7 @@ namespace eval ::plugins::${plugin_name} {
 
 	proc ::wibble::return_200_json {content} {
 		dict set response status 200
-		dict set state response header content-type "" {application/json charset utf-8}
+		dict set response header content-type {} application/json
 		dict set response content "$content\n"
 		sendresponse $response
 	}
@@ -116,7 +116,7 @@ namespace eval ::plugins::${plugin_name} {
 		set file_data [read $fp]
 		close $fp
 
-	    dict set state response status 200
+	  dict set state response status 200
 		dict set state response header content-type "" text/html
 		dict set state response content $file_data
 		sendresponse [dict get $state response]
@@ -244,14 +244,14 @@ namespace eval ::plugins::${plugin_name} {
         profile_title  [lindex $loadedShots(profile_title) $i] \
         bean_desc   [lindex $loadedShots(bean_desc) $i] \
         bean_brand    [lindex $loadedShots(bean_brand) $i] \
-        bean_notes   [lindex $loadedShots(bean_notes) $i] \
+        bean_notes   [string map {\n \\n} [lindex $loadedShots(bean_notes) $i]] \
         drink_weight  [lindex $loadedShots(drink_weight) $i] \
         grinder_dose_weight   [lindex $loadedShots(grinder_dose_weight) $i] \
         target_drink_weight   [lindex $loadedShots(target_drink_weight) $i] \
         extraction_time    [lindex $loadedShots(extraction_time) $i] \
         filename  [lindex $loadedShots(filename) $i] \
         espresso_enjoyment   [lindex $loadedShots(espresso_enjoyment) $i] \
-        espresso_notes    [lindex $loadedShots(espresso_notes) $i] \
+        espresso_notes    [string map {\n \\n} [lindex $loadedShots(espresso_notes) $i]] \
         shot_desc  [lindex $loadedShots(shot_desc) $i]] 
 
       # Append the dictionary to the jsonArray list
