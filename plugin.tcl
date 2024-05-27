@@ -212,6 +212,10 @@ namespace eval ::plugins::${plugin_name} {
     if { ![check_auth $state] } {
 			return;
 		}
+    set method [dict get $state request method]
+    if { $method eq "PUT" } {
+      return [set_next_shot_in_dye state]
+    }
 		set path [dict get $state request path]
 		set shot [lindex [split $path "/"] 4]
     append shotName [lindex [split $shot "."] 0] ".json"
@@ -224,6 +228,10 @@ namespace eval ::plugins::${plugin_name} {
 		} else {
       ::wibble::return_200_json
     }
+  }
+
+  proc ::wibble::set_next_shot_in_dye { state } {
+    ::wibble::return_200_json ""
   }
 
   proc ::wibble::history_sdb { state } {
@@ -406,7 +414,7 @@ namespace eval ::plugins::${plugin_name} {
 
 		::logging::flush_log
 
-		::wibble::return_200_json 
+		::wibble::return_200_json ""
 	}
 
 
