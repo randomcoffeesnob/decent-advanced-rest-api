@@ -335,7 +335,7 @@
         window.chart.data.datasets.forEach(ds => ds.data = null);
         window.chart.update();
       } else {
-        fetch(address + "/api/shot/" + selected + '?download=true').then(r => r.text())
+        fetch(address + "/api/shot/" + selected + '.shot?download=true').then(r => r.text())
           .then(t => {
 
             var element = document.createElement('a');
