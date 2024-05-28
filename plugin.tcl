@@ -57,7 +57,7 @@ namespace eval ::plugins::${plugin_name} {
 
 	proc ::wibble::return_200_json {content} {
 		dict set response status 200
-		dict set state response header content-type "" {application/json charset utf-8}
+		dict set response header content-type {} application/json
 		dict set response content "$content\n"
 		sendresponse $response
 	}
@@ -116,7 +116,7 @@ namespace eval ::plugins::${plugin_name} {
 		set file_data [read $fp]
 		close $fp
 
-	    dict set state response status 200
+	  dict set state response status 200
 		dict set state response header content-type "" text/html
 		dict set state response content $file_data
 		sendresponse [dict get $state response]
@@ -224,6 +224,41 @@ namespace eval ::plugins::${plugin_name} {
 		} else {
       ::wibble::return_200_json
     }
+  }
+
+  proc ::wibble::history_sdb { state } {
+    if { ![check_auth $state] } {
+			return;
+		}
+    # TODO: check SDB plugin exists and is loaded
+    array set loadedShots [::plugins::SDB::shots *]
+    set jsonArray {}
+    set listLength [llength $loadedShots(grinder_setting)]
+
+    for {set i 0} {$i < $listLength} {incr i} {
+      # Create a dictionary for each index
+      set shotDict [dict create \
+        clock [lindex $loadedShots(clock) $i] \
+        grinder_setting   [lindex $loadedShots(grinder_setting) $i] \
+        grinder_model    [lindex $loadedShots(grinder_model) $i] \
+        profile_title  [lindex $loadedShots(profile_title) $i] \
+        bean_desc   [lindex $loadedShots(bean_desc) $i] \
+        bean_brand    [lindex $loadedShots(bean_brand) $i] \
+        bean_type    [lindex $loadedShots(bean_type) $i] \
+        bean_notes   [string map {\n \\n} [lindex $loadedShots(bean_notes) $i]] \
+        drink_weight  [lindex $loadedShots(drink_weight) $i] \
+        grinder_dose_weight   [lindex $loadedShots(grinder_dose_weight) $i] \
+        target_drink_weight   [lindex $loadedShots(target_drink_weight) $i] \
+        extraction_time    [lindex $loadedShots(extraction_time) $i] \
+        filename  [lindex $loadedShots(filename) $i] \
+        espresso_enjoyment   [lindex $loadedShots(espresso_enjoyment) $i] \
+        espresso_notes    [string map {\n \\n} [lindex $loadedShots(espresso_notes) $i]] \
+        shot_desc  [lindex $loadedShots(shot_desc) $i]] 
+
+      # Append the dictionary to the jsonArray list
+      lappend jsonArray $shotDict
+    }
+    ::wibble::return_200_json [::wibble::compile_json {list dict} $jsonArray]
   }
 
 	# based on https://github.com/Testsubject1683/de1-mirror/tree/webapi
@@ -383,9 +418,8 @@ namespace eval ::plugins::${plugin_name} {
 		::wibble::handle /api/shot history
 		::wibble::handle /api/help docs
     ::wibble::handle /api/v2/shot history_v2
+    ::wibble::handle /api/v2/shots history_sdb
 		::wibble::handle / indexpage
-
-
         # Start a server and enter the event loop if not already there.
 
         catch {
