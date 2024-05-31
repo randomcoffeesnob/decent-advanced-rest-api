@@ -214,7 +214,7 @@ namespace eval ::plugins::${plugin_name} {
 		}
     set method [dict get $state request method]
     if { $method eq "PUT" } {
-      return [set_next_shot_in_dye state]
+      return [set_next_shot_in_dye $state]
     }
 		set path [dict get $state request path]
 		set shot [lindex [split $path "/"] 4]
@@ -231,6 +231,27 @@ namespace eval ::plugins::${plugin_name} {
   }
 
   proc ::wibble::set_next_shot_in_dye { state } {
+    set path [dict get $state request path]
+		set shot [lindex [split $path "/"] 4]
+    
+    msg -INFO "shot name is ${shot}"
+    
+    set fields {
+      workflow_settings
+      shot_profile
+      ratio
+      drink_weight
+      grinder_dose_weight 
+      grinder_setting 
+      grinder_model 
+      workflow
+      bean_brand
+      bean_type
+      roast_date
+      roast_level
+      bean_notes
+    }
+    ::plugins::DYE::shots::source_next_from $shot {} $fields
     ::wibble::return_200_json ""
   }
 
