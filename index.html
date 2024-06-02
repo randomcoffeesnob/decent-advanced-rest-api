@@ -279,6 +279,23 @@
               window.chart.update();
             });
       }
+    
+    function setAsNextShot() {
+      let selected = document.getElementById("shots").value;
+      if (!selected) {
+        return;
+      }
+      fetch(address + "/api/v2/shot/" + selected, { method: 'PUT' }).then(response => {
+        if (response.status == 200) {
+          document.getElementById("modal-content").innerText = "Shot update successful"
+        }
+        else {
+          document.getElementById("modal-content").innerText = `Shot update error: ${response.statusText}`
+        }
+        document.getElementById("modal-control").checked = true;
+      })
+      .catch(error => alert(error.message));
+    }
 
     function loadSelectedProfile () {
       let selected = document.getElementById("profiles").value;
@@ -495,6 +512,7 @@
         </svg>
       </button>
       <button onclick="downloadShot()">Download Shot</button>
+      <button onclick="setAsNextShot()">Set as next in DYE</button>
       <!-- <span class="icon-search"></span> -->
       <br />
       <div style="max-width: 100%;">

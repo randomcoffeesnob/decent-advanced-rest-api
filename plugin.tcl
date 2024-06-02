@@ -212,6 +212,10 @@ namespace eval ::plugins::${plugin_name} {
     if { ![check_auth $state] } {
 			return;
 		}
+    set method [dict get $state request method]
+    if { $method eq "PUT" } {
+      return [set_next_shot_in_dye $state]
+    }
 		set path [dict get $state request path]
 		set shot [lindex [split $path "/"] 4]
     append shotName [lindex [split $shot "."] 0] ".json"
@@ -224,6 +228,31 @@ namespace eval ::plugins::${plugin_name} {
 		} else {
       ::wibble::return_200_json
     }
+  }
+
+  proc ::wibble::set_next_shot_in_dye { state } {
+    set path [dict get $state request path]
+		set shot [lindex [split $path "/"] 4]
+    
+    msg -INFO "shot name is ${shot}"
+    
+    set fields {
+      workflow_settings
+      shot_profile
+      ratio
+      drink_weight
+      grinder_dose_weight 
+      grinder_setting 
+      grinder_model 
+      workflow
+      bean_brand
+      bean_type
+      roast_date
+      roast_level
+      bean_notes
+    }
+    ::plugins::DYE::shots::source_next_from $shot {} $fields
+    ::wibble::return_200_json ""
   }
 
   proc ::wibble::history_sdb { state } {
@@ -280,9 +309,9 @@ namespace eval ::plugins::${plugin_name} {
 				dict set return "roast_date" $::settings(roast_date)
 				dict set return "roast_level" $::settings(roast_level)
 				dict set return "skin" [::profile::filename_from_title $::settings(skin)]
-				dict set return "head_temperature" $::de1(head_temperature)
-				dict set return "mix_temperature" $::de1(mix_temperature)
-				dict set return "steam_heater_temperature" $::de1(steam_heater_temperature)
+				dict set return "head_temperature" [expr [expr {floor([expr $::de1(head_temperature) * 100])} / 100]]
+				dict set return "mix_temperature" [expr [expr {floor([expr $::de1(mix_temperature) * 100])} / 100]]
+				dict set return "steam_heater_temperature" [expr [expr {floor([expr $::de1(steam_heater_temperature) * 100])} / 100]]
 				dict set return "water_level" [water_tank_level_to_milliliters $::de1(water_level)] [translate mL]
 			}
 			"Espresso" {
@@ -406,7 +435,7 @@ namespace eval ::plugins::${plugin_name} {
 
 		::logging::flush_log
 
-		::wibble::return_200_json 
+		::wibble::return_200_json ""
 	}
 
 
