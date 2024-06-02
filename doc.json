@@ -38,7 +38,7 @@
         {
             "method": "POST",
             "path": "/api/profile/",
-            "description": "add a profile to your machine - the filename will be the current timestamp so nothing should be overwritten"
+            "description": "add a profile to your machine - the filename of the uploaded profile will be used, so existing profiles could be overwritten"
         },
         {
             "method": "PUT",
@@ -56,9 +56,24 @@
             "description": "Flush the log"
         },
         {
-            "method": "GET",
-            "path": "/api/help",
-            "description": "Get this short API doc."
+            "method": "PUT",
+            "path": "/api/v2/shot/{timestamp}",
+            "description": "Set the specified shots' DYE description as next planned shot in DYE."
+        },
+        {
+          "method": "GET",
+          "path": "/api/v2/shot/{timestamp}",
+          "description": "Returns a json representation of the specified shot (if found)."
+        },
+        {
+          "method": "GET",
+          "path": "/api/v2/shots",
+          "description": "Returns a json array of all the shots data present in SDB. Does not include graph data."
+        },
+        {
+          "method": "GET",
+          "path": "/api/help",
+          "description": "Get this short API doc."
         }
     ],
     "authentication": "Authentication is done with a header param auth - if enabled it needs to match the configured string"
