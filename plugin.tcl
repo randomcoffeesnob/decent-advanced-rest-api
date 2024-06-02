@@ -309,9 +309,9 @@ namespace eval ::plugins::${plugin_name} {
 				dict set return "roast_date" $::settings(roast_date)
 				dict set return "roast_level" $::settings(roast_level)
 				dict set return "skin" [::profile::filename_from_title $::settings(skin)]
-				dict set return "head_temperature" $::de1(head_temperature)
-				dict set return "mix_temperature" $::de1(mix_temperature)
-				dict set return "steam_heater_temperature" $::de1(steam_heater_temperature)
+				dict set return "head_temperature" [expr [expr {floor([expr $::de1(head_temperature) * 100])} / 100]]
+				dict set return "mix_temperature" [expr [expr {floor([expr $::de1(mix_temperature) * 100])} / 100]]
+				dict set return "steam_heater_temperature" [expr [expr {floor([expr $::de1(steam_heater_temperature) * 100])} / 100]]
 				dict set return "water_level" [water_tank_level_to_milliliters $::de1(water_level)] [translate mL]
 			}
 			"Espresso" {
