@@ -312,7 +312,7 @@ namespace eval ::plugins::${plugin_name} {
 				dict set return "head_temperature" [expr [expr {floor([expr $::de1(head_temperature) * 100])} / 100]]
 				dict set return "mix_temperature" [expr [expr {floor([expr $::de1(mix_temperature) * 100])} / 100]]
 				dict set return "steam_heater_temperature" [expr [expr {floor([expr $::de1(steam_heater_temperature) * 100])} / 100]]
-				dict set return "water_level" [water_tank_level_to_milliliters $::de1(water_level)] [translate mL]
+				dict set return "water_level_ml" [water_tank_level_to_milliliters $::de1(water_level)]
 			}
 			"Espresso" {
 				foreach key [list "espresso_elapsed" "espresso_pressure" "espresso_weight" "espresso_flow" "espresso_flow_weight" "espresso_temperature_basket" "espresso_temperature_mix"] {

@@ -33,7 +33,7 @@ rest:
         unit_of_measurement: "ºC"
       - name: Decent Espresso Water Level
         unique_id: decentespresso_water_level
-        value_template: "{{ value_json.water_level|replace(' mL', '')|default(0) }}"
+        value_template: "{{ value_json.water_level_ml|default(0) }}"
         unit_of_measurement: ml
       - name: Decent Espresso Profile
         unique_id: decentespresso_profile
