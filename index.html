@@ -285,10 +285,16 @@
       if (!selected) {
         return;
       }
-      fetch(address + "/api/v2/shot/" + selected, { method: 'PUT' }).then(r => r.text())
-        .then(t => {
-          console.log(t);
-        })
+      fetch(address + "/api/v2/shot/" + selected, { method: 'PUT' }).then(response => {
+        if (response.status == 200) {
+          document.getElementById("modal-content").innerText = "Shot update successful"
+        }
+        else {
+          document.getElementById("modal-content").innerText = `Shot update error: ${response.statusText}`
+        }
+        document.getElementById("modal-control").checked = true;
+      })
+      .catch(error => alert(error.message));
     }
 
     function loadSelectedProfile () {
