@@ -2,6 +2,7 @@ package require de1_machine 1.2
 package require json
 package require de1_profile 2.0
 package require de1_vars 1.0
+package require de1_utils 1.1
 
 set plugin_name "advanced_rest_api"
 
@@ -298,6 +299,9 @@ namespace eval ::plugins::${plugin_name} {
 		set json_structure {dict state string}
 		dict set return "state" $::de1_num_state($::de1(state))
 		dict set return "substate" $::de1_substate_types($::de1(substate))
+		dict set return "battery_percent" [battery_percent]
+		dict set return "charger_on" $::de1(usb_charger_on)
+
 		switch -- $::de1_num_state($::de1(state)) {
 			"Idle" {
 				dict set return "profile" [::profile::filename_from_title $::settings(profile_title)]
