@@ -100,7 +100,7 @@ namespace eval ::plugins::${plugin_name} {
                   if {[string is double -strict $data]} {
                       return $data
                   } else {
-                      return "\"$data\""
+                      return "\"[::wibble::remove_newlines $data]\""
                   }
               }
               default {error "Invalid type"}
@@ -108,6 +108,11 @@ namespace eval ::plugins::${plugin_name} {
       }
   }
 
+	proc ::wibble::remove_newlines {input_string} {
+    # Replace all newlines (\n) in the string with an escaped newline string
+    set output_string [string map {\n "\\n"} $input_string]
+    return $output_string
+}
 	# Index endpoint
 	proc ::wibble::indexpage {state} {
 		   if { ![check_auth $state] } {
