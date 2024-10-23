@@ -100,7 +100,7 @@ namespace eval ::plugins::${plugin_name} {
                   if {[string is double -strict $data]} {
                       return $data
                   } else {
-                      return "\"[::wibble::remove_newlines $data]\""
+                      return "\"[::wibble::escape_json $data]\""
                   }
               }
               default {error "Invalid type"}
@@ -108,11 +108,29 @@ namespace eval ::plugins::${plugin_name} {
       }
   }
 
-	proc ::wibble::remove_newlines {input_string} {
+	proc ::wibble::escape_json {input_str} {
     # Replace all newlines (\n) in the string with an escaped newline string
-    set output_string [string map {\n "\\n"} $input_string]
-    return $output_string
-}
+		set output_str $input_str
+
+    # Escape backslashes
+    regsub -all {\\} $output_str {\\\\} output_str
+
+    # Escape double quotes
+    regsub -all {"} $output_str {\\"} output_str
+
+    # Escape forward slashes
+    regsub -all {/} $output_str {\\/} output_str
+
+    # Escape special control characters
+    regsub -all {\n} $output_str {\\n} output_str
+    regsub -all {\r} $output_str {\\r} output_str
+    regsub -all {\t} $output_str {\\t} output_str
+    regsub -all {\b} $output_str {\\b} output_str
+    regsub -all {\f} $output_str {\\f} output_str
+
+    # Return the escaped string
+    return $output_str
+  }
 	# Index endpoint
 	proc ::wibble::indexpage {state} {
 		   if { ![check_auth $state] } {
