@@ -10,7 +10,7 @@ namespace eval ::plugins::${plugin_name} {
 
     variable author "Yannick Dietler"
     variable contact "ydt@ydt.ch"
-    variable version 1.2
+    variable version 1.3
     variable description "API to control the DE1's power state and getting additional Information"
     variable name "Advanced REST API"
 
